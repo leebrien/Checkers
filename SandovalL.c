@@ -12,6 +12,8 @@ Lee Brien V. Sandoval, 12209317
 #include <windows.h>
 #include <stdbool.h>
 
+#define SIZE 20
+
 typedef char String50[21];
 typedef char String200[151];
 typedef char String30[31];
@@ -27,8 +29,6 @@ struct quizRecord
     String30 C3;
     String30 qAnswer;
 };
-
-typedef struct quizRecord quizRecord;
 
 /* This function is for getting the password of the admin.
 Precondition: The length of the password is limited to 30 characters
@@ -60,6 +60,33 @@ void getPassword(String30 password)
         }
     }
     password[i] = '\0';
+}
+
+/* This function is for getting the string for the record.
+Precondition: The length of the password is limited to 30 characters
+@param password This holds the inputted string as a password
+@return void
+*/
+void getString(String200 Question){
+
+    char ch;
+	int i = 0;
+	String200 stringInput;
+	
+	do
+	{
+		scanf("%c", &ch);
+		
+		if(ch != '\n')
+		{
+			stringInput[i] = ch;
+			i++;
+			stringInput[i] = '\0';
+		}
+	}while (i < 201 && ch != '\n');
+	
+	strcpy(Question, stringInput);
+
 }
 
 /* This function is for logging into admin after registration
@@ -95,9 +122,10 @@ void adminLogin(String30 password, String30 currentPassword, bool *returnMenu, b
             printf("\n\nLogin Successful!\n\n");
             system("pause");
             system("cls");
-
-            validInput = true;
+            
             *bContinue = true;
+            validInput = true;
+
         }
 
         else if (strcmp(password, currentPassword) != 0)
@@ -166,9 +194,10 @@ void adminRegistration(String30 password, String30 tempPassword, String30 curren
             system("pause");
             system("cls");
 
+            *bContinue = true;
             validInput = true;
             strcpy(currentPassword, password);
-            *bContinue = true;
+            
         }
 
         else if (strcmp(password, tempPassword) != 0)
@@ -204,29 +233,41 @@ void adminRegistration(String30 password, String30 tempPassword, String30 curren
 }
 
 /* This function is for adding a record into the quiz.
-Precondition: The length of the password is limited to 30 characters
+@param records is the array of structures for quiz records.
 @param password This holds the inputted string as a password.
+@param ctrRecord is the value of the number of existing records.
 @return void
 */
-void addRecord(){
+int addRecord(struct quizRecord *records, int ctrRecord){
+
+    system("cls");
+
+    ctrRecord += 1;
+
+    printf("Enter a question: ");
+    getString( & ((records + ctrRecord - 1) -> Question));
+
 
     
 }
 
 /* This function is the menu for admins which manages the data of the program
 Precondition: cInput from int main() must be 'm' or 'M'
+@param records is the array of structures for quiz records.
 @param password This holds the inputted string as a password.
 @param tempPassword is used to compare the password input.
 @param currentPassword is used if user will return to manage data.
 @param returnMenu This is for choosing if the user wishes to return to the
        main menu after an incorrect password input.
+@param ctrRecord is the value of the number of existing records.
 @return void
 */
-void manageData(String30 password, String30 tempPassword, String30 currentPassword, bool *returnMenu)
+void manageData(struct quizRecord *records, String30 password, String30 tempPassword, String30 currentPassword, bool *returnMenu, int* ctrRecord)
 {
 
     bool bContinue = false;
     bool switchValid = false;
+    bool returnManageData = false;
     char adminInput;
 
     system("cls");
@@ -244,7 +285,7 @@ void manageData(String30 password, String30 tempPassword, String30 currentPasswo
 
     if (bContinue == true)
     {
-        while (switchValid = true)
+        do 
         {
 
             system("cls");
@@ -297,20 +338,26 @@ void manageData(String30 password, String30 tempPassword, String30 currentPasswo
                 *returnMenu = true;
                 switchValid = true;
                 break;
+
+            default:
+                switchValid = false;
+
             }
-        }
+        }while (switchValid == false || returnManageData == true);
     }
 }
 
 /* This function serves as the main menu of the program.
+@param records is the array of structure for quiz records.
 @param password This holds the inputted string as a password.
 @param tempPassword is used to compare the password input.
 @param currentPassword is used if user will return to manage data.
 @return void
 */
-void enterMenu(String30 password, String30 tempPassword, String30 currentPassword)
+void enterMenu(struct quizRecord *records, String30 password, String30 tempPassword, String30 currentPassword)
 {
-
+    
+    int ctrRecord = 0;
     char cInput;
     bool validInput = false;
     bool returnMenu = true;
@@ -339,7 +386,7 @@ void enterMenu(String30 password, String30 tempPassword, String30 currentPasswor
         case 'M':
             validInput = true;
             returnMenu = false;
-            manageData(password, tempPassword, currentPassword, &returnMenu);
+            manageData(records, password, tempPassword, currentPassword, &returnMenu, &ctrRecord);
             break;
 
         default:
@@ -357,7 +404,9 @@ int main()
     // This will change once user registers.
     String30 currentPassword = "N/A";
 
-    enterMenu(password, tempPassword, currentPassword);
+    struct quizRecord records[SIZE];
+
+    enterMenu(records, password, tempPassword, currentPassword);
 
     return 0;
 }
