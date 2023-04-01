@@ -15,7 +15,7 @@ Lee Brien V. Sandoval, 12209317
 #define SIZE 20
 
 typedef char String50[21];
-typedef char String200[151];
+typedef char String150[151];
 typedef char String30[31];
 
 // This struct holds the components of a question
@@ -23,7 +23,7 @@ struct quizRecord
 {
     String50 topicName;
     int qNumber;
-    String200 Question;
+    String150 Question;
     String30 C1;
     String30 C2;
     String30 C3;
@@ -63,30 +63,54 @@ void getPassword(String30 password)
 }
 
 /* This function is for getting the string for the record.
-Precondition: The length of the password is limited to 30 characters
+Precondition: The length of the input is limited to 200 characters
 @param password This holds the inputted string as a password
 @return void
 */
-void getString(String200 Question){
+void getString(char string[], int nSize)
+{
 
     char ch;
-	int i = 0;
-	String200 stringInput;
-	
-	do
-	{
-		scanf("%c", &ch);
-		
-		if(ch != '\n')
-		{
-			stringInput[i] = ch;
-			i++;
-			stringInput[i] = '\0';
-		}
-	}while (i < 201 && ch != '\n');
-	
-	strcpy(Question, stringInput);
+    int i = 0;
+    String150 stringInput;
 
+    do
+    {
+        if (i == 0)
+        {
+
+            scanf(" %c", &ch);
+
+            if (ch != '\n')
+            {
+                stringInput[i] = ch;
+                i++;
+                stringInput[i] = '\0';
+            }
+        }
+
+        else
+        {
+
+            scanf("%c", &ch);
+
+            if (ch != '\n')
+            {
+                stringInput[i] = ch;
+                i++;
+                stringInput[i] = '\0';
+            }
+        }
+        
+    } while (ch != '\n');
+
+    if (stringInput[strlen(stringInput) - 1] == ' ')
+    {
+
+        stringInput[strlen(stringInput) - 1] = '\0';
+    }
+
+    strcpy(string, stringInput);
 }
 
 /* This function is for logging into admin after registration
@@ -122,10 +146,9 @@ void adminLogin(String30 password, String30 currentPassword, bool *returnMenu, b
             printf("\n\nLogin Successful!\n\n");
             system("pause");
             system("cls");
-            
+
             *bContinue = true;
             validInput = true;
-
         }
 
         else if (strcmp(password, currentPassword) != 0)
@@ -197,7 +220,6 @@ void adminRegistration(String30 password, String30 tempPassword, String30 curren
             *bContinue = true;
             validInput = true;
             strcpy(currentPassword, password);
-            
         }
 
         else if (strcmp(password, tempPassword) != 0)
@@ -233,22 +255,127 @@ void adminRegistration(String30 password, String30 tempPassword, String30 curren
 }
 
 /* This function is for adding a record into the quiz.
+Precondition: Assume that the input is case sensitive when checking existing records.
 @param records is the array of structures for quiz records.
 @param password This holds the inputted string as a password.
 @param ctrRecord is the value of the number of existing records.
 @return void
 */
-int addRecord(struct quizRecord *records, int ctrRecord){
+void addRecord(struct quizRecord *records, int *ctrRecord)
+{
 
     system("cls");
 
-    ctrRecord += 1;
+    String150 tempQuestion;
+    String30 tempAnswer;
+    bool existingRecord = false;
+    bool returnMenu = false;
+    bool cInputValid = false;
+    char cInput;
 
-    printf("Enter a question: ");
-    getString( & ((records + ctrRecord - 1) -> Question));
+    do
+    {
+        system("cls");
 
+        printf("Enter a question: ");
+        getString(tempQuestion, 151);
+        printf("\nEnter the answer: ");
+        getString(tempAnswer, 31);
 
-    
+        for (int i = 0; i < SIZE; i++)
+        {
+
+            if (strcmp(tempQuestion, records[i].Question) == 0)
+            {
+
+                if (strcmp(tempAnswer, records[i].qAnswer) == 0)
+                {
+
+                    system("cls");
+                    printf("%s\n", records[i].topicName);
+                    printf("%d. %s\n", records[i].qNumber, records[i].Question);
+                    printf("A) %s\n", records[i].C1);
+                    printf("B) %s\n", records[i].C2);
+                    printf("C) %s\n", records[i].C3);
+                    printf("\nAnswer: %s\n\n", records[i].qAnswer);
+
+                    printf("RECORD ALREADY LISTED\n\n");
+
+                    system("pause");
+
+                    existingRecord = true;
+                }
+            }
+        }
+
+        if (existingRecord == false)
+        {
+
+            system("cls");
+
+            strcpy(records[*ctrRecord].Question, tempQuestion);
+            strcpy(records[*ctrRecord].qAnswer, tempAnswer);
+
+            printf("%s", records[*ctrRecord].Question);
+            printf("\n%s", records[*ctrRecord].qAnswer);
+
+            printf("\n\nEnter topic: ");
+            getString(records[*ctrRecord].topicName, 51);
+            printf("Enter 1st choice: ");
+            getString(records[*ctrRecord].C1, 31);
+            printf("Enter 2nd choice: ");
+            getString(records[*ctrRecord].C2, 31);
+            printf("Enter 3rd choice: ");
+            getString(records[*ctrRecord].C3, 31);
+
+            records[*ctrRecord].qNumber = *ctrRecord + 1;
+
+            *ctrRecord += 1;
+
+            system("cls");
+            printf("Record Successfully Added!\n\n");
+            system("pause");
+        }
+
+        else
+        {
+
+            do
+            {
+
+                system("cls");
+
+                printf("Return to MANAGE DATA?\n");
+                printf("[Y] if yes");
+                printf("\n[N] if no");
+
+                printf("\n\nEnter: ");
+                scanf(" %c", &cInput);
+
+                switch (cInput)
+                {
+
+                case 'Y':
+                case 'y':
+                    returnMenu = true;
+                    cInputValid = true;
+                    break;
+
+                case 'N':
+                case 'n':
+                    returnMenu = false;
+                    cInputValid = true;
+                    break;
+
+                default:
+                    cInputValid = false;
+                    break;
+                }
+
+            } while (cInputValid == false);
+        }
+
+    } while (existingRecord == true && returnMenu == false);
 }
 
 /* This function is the menu for admins which manages the data of the program
@@ -262,7 +389,7 @@ Precondition: cInput from int main() must be 'm' or 'M'
 @param ctrRecord is the value of the number of existing records.
 @return void
 */
-void manageData(struct quizRecord *records, String30 password, String30 tempPassword, String30 currentPassword, bool *returnMenu, int* ctrRecord)
+void manageData(struct quizRecord *records, String30 password, String30 tempPassword, String30 currentPassword, bool *returnMenu, int *ctrRecord)
 {
 
     bool bContinue = false;
@@ -285,7 +412,7 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
 
     if (bContinue == true)
     {
-        do 
+        do
         {
 
             system("cls");
@@ -305,8 +432,9 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
 
             case 'a':
             case 'A':
-                // function
+                addRecord(records, ctrRecord);
                 switchValid = true;
+                *returnMenu = true;
                 break;
 
             case 'e':
@@ -341,9 +469,8 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
 
             default:
                 switchValid = false;
-
             }
-        }while (switchValid == false || returnManageData == true);
+        } while (switchValid == false || returnManageData == true);
     }
 }
 
@@ -356,7 +483,7 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
 */
 void enterMenu(struct quizRecord *records, String30 password, String30 tempPassword, String30 currentPassword)
 {
-    
+
     int ctrRecord = 0;
     char cInput;
     bool validInput = false;
