@@ -543,7 +543,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
                     {
 
                         system("cls");
-                        printf("Input does not match with any of the given question numbers, try again\n\n");
+                        printf("Input does not match with any of the given question numbers, try again.\n\n");
                         system("pause");
                         system("cls");
                     }
@@ -647,6 +647,227 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 
     }
 }
+
+/* This function is for deleting existing records of the quiz.
+Precondition: Topic names are case sensitive.
+@param records is the array of structures for quiz records.
+@param ctrRecord is the value of the number of existing records.
+@param returnManageData is an option to return to manage data menu when opt enter a topic.
+@return void
+*/
+void deleteRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageData)
+{
+
+    int tempSize = *ctrRecord;
+    int numberInput;
+    int inputIndex;
+
+    char uniqueTopics[tempSize][51];
+    char cInputDelete;
+
+    String50 topicInput;
+
+    bool inputValid = false;
+
+    if (*ctrRecord > 0){
+        
+        // Copy all the topic names into a different string array.
+        for (int i = 0; i < tempSize; i++)
+        {
+            strcpy(uniqueTopics[i], records[i].Topic);
+        }
+
+        // Remove the duplicate topic names of the array.
+        for (int j = 0; j < tempSize; j++)
+        {
+
+            for (int k = j + 1; k < tempSize; k++)
+            {
+
+                if (strcmp(uniqueTopics[j], uniqueTopics[k]) == 0)
+                {
+
+                    for (int l = k; l < tempSize; l++)
+                    {
+
+                        strcpy(uniqueTopics[l], uniqueTopics[l + 1]);
+                    }
+
+                    tempSize -= 1;
+
+                    k--;
+                }
+            }
+        }
+
+        do
+        {
+            do
+            {
+                system("cls");
+                printf("Choose a topic or return to menu\n\n");
+
+                for (int i = 0; i < tempSize; i++)
+                {
+
+                    printf(" %d. %s\n", i + 1, uniqueTopics[i]);
+                }
+
+                printf("\n[%d] Return to menu\n", 0);
+
+                printf("\nEnter: ");
+                scanf("%s", topicInput);
+                
+                if (strcmp(topicInput, "0") == 0)
+                {
+
+                    inputValid = true;
+
+                }
+
+                for (int i = 0; i < tempSize; i++)
+                {
+
+                    if (strcmp(topicInput, uniqueTopics[i]) == 0)
+                    {
+
+                        inputValid = true;
+                    }
+                }
+
+                if (inputValid == false)
+                {
+
+                    system("cls");
+                    printf("Input does not match any of the given topics, try again.\n\n");
+                    system("pause");
+                }
+
+            } while (inputValid == false);
+            
+            if (strcmp(topicInput, "0") == 0)
+            {
+
+                *returnManageData = true;
+
+            }
+
+            else
+            {
+
+                system("cls");
+
+                do
+                {
+
+                    inputValid = false;
+
+                    for (int i = 0; i < *ctrRecord; i++)
+                    {
+
+                        if (strcmp(topicInput, records[i].Topic) == 0)
+                        {
+
+                            printf("[%d] %s\n", records[i].Number, records[i].Question);
+                        }
+                    }
+
+                    printf("\nChoose a question (Enter corresponding number): ");
+                    scanf("%d", &numberInput);
+
+                    for (int i = 0; i < *ctrRecord; i++)
+                    {
+
+                        if (numberInput == records[i].Number)
+                        {
+
+                            inputValid = true;
+
+                            inputIndex = i;
+                        }
+                    }
+
+                    if (inputValid == false)
+                    {
+
+                        system("cls");
+                        printf("Input does not match with any of the given question numbers, try again.\n\n");
+                        system("pause");
+                        system("cls");
+                    }
+
+                } while (inputValid == false);
+
+                do{
+                    printf("\nAre you sure you want to delete this record?");
+                    printf("\n[Y] Yes\n[N] No\n\n");
+                    
+                    printf("Enter: ");
+                    scanf(" %c", &cInputDelete);
+
+                    switch(cInputDelete){
+
+                        case 'y':
+                        case 'Y':
+                            
+                            for (int i = inputIndex; i < *ctrRecord; i++){
+                                
+                                strcpy(records[i].Topic,records[i+1].Topic);
+                                records[i+1].Number -= 1;
+                                strcpy(records[i].Question,records[i+1].Question);
+                                strcpy(records[i].C1,records[i+1].C1);
+                                strcpy(records[i].C2,records[i+1].C2);
+                                strcpy(records[i].C3,records[i+1].C3);
+                                strcpy(records[i].Answer,records[i+1].Answer);
+                            
+                            }
+
+                            *ctrRecord -= 1;
+                            inputValid = true;
+                            break;
+
+                        case 'n':
+                        case 'N':
+                            inputValid = true;
+                            break;
+
+                        default:
+                            inputValid = false;
+                    }
+                    
+                    if (cInputDelete == 'Y' || cInputDelete == 'y'){
+                        
+                        system("cls");
+                        printf("Record Deleted!\n\n");
+                        system("pause");
+
+                    }
+
+                    else if (inputValid == false){
+                        
+                        system("cls");
+                        printf("Invalid input, try again.\n");
+                        system("pause");
+
+                    }
+
+                }while(inputValid == false); 
+
+            }
+
+        }while (*returnManageData == false);
+
+    }
+
+    else{
+
+        system("cls");
+        printf("There are no records to delete.\n\n");
+        system("pause");
+        *returnManageData = true;
+    }
+}
+
 /* This function is the menu for admins which manages the data of the program
 Precondition: cInput from int main() must be 'm' or 'M'
 @param records is the array of structures for quiz records.
@@ -714,7 +935,7 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
 
             case 'd':
             case 'D':
-                // function
+                deleteRecord(records, ctrRecord, &returnManageData);
                 switchValid = true;
                 break;
 
