@@ -21,13 +21,13 @@ typedef char String30[31];
 // This struct holds the components of a question
 struct quizRecord
 {
-    String50 topicName;
-    int qNumber;
+    String50 Topic;
+    int Number;
     String150 Question;
     String30 C1;
     String30 C2;
     String30 C3;
-    String30 qAnswer;
+    String30 Answer;
 };
 
 /* This function is for getting the password of the admin.
@@ -101,7 +101,7 @@ void getString(char string[], int nSize)
                 stringInput[i] = '\0';
             }
         }
-        
+
     } while (ch != '\n');
 
     if (stringInput[strlen(stringInput) - 1] == ' ')
@@ -257,7 +257,6 @@ void adminRegistration(String30 password, String30 tempPassword, String30 curren
 /* This function is for adding a record into the quiz.
 Precondition: Assume that the input is case sensitive when checking existing records.
 @param records is the array of structures for quiz records.
-@param password This holds the inputted string as a password.
 @param ctrRecord is the value of the number of existing records.
 @return void
 */
@@ -270,7 +269,8 @@ void addRecord(struct quizRecord *records, int *ctrRecord)
     String30 tempAnswer;
     bool existingRecord = false;
     bool returnMenu = false;
-    bool cInputValid = false;
+    bool inputValid = false;
+    bool answerMatch = false;
     char cInput;
 
     do
@@ -288,16 +288,16 @@ void addRecord(struct quizRecord *records, int *ctrRecord)
             if (strcmp(tempQuestion, records[i].Question) == 0)
             {
 
-                if (strcmp(tempAnswer, records[i].qAnswer) == 0)
+                if (strcmp(tempAnswer, records[i].Answer) == 0)
                 {
 
                     system("cls");
-                    printf("%s\n", records[i].topicName);
-                    printf("%d. %s\n", records[i].qNumber, records[i].Question);
+                    printf("%s\n", records[i].Topic);
+                    printf("%d. %s\n", records[i].Number, records[i].Question);
                     printf("A) %s\n", records[i].C1);
                     printf("B) %s\n", records[i].C2);
                     printf("C) %s\n", records[i].C3);
-                    printf("\nAnswer: %s\n\n", records[i].qAnswer);
+                    printf("\nAnswer: %s\n\n", records[i].Answer);
 
                     printf("RECORD ALREADY LISTED\n\n");
 
@@ -314,27 +314,50 @@ void addRecord(struct quizRecord *records, int *ctrRecord)
             system("cls");
 
             strcpy(records[*ctrRecord].Question, tempQuestion);
-            strcpy(records[*ctrRecord].qAnswer, tempAnswer);
+            strcpy(records[*ctrRecord].Answer, tempAnswer);
 
-            printf("%s", records[*ctrRecord].Question);
-            printf("\n%s", records[*ctrRecord].qAnswer);
+            do
+            {
+                printf("%s", records[*ctrRecord].Question);
+                printf("\n%s", records[*ctrRecord].Answer);
 
-            printf("\n\nEnter topic: ");
-            getString(records[*ctrRecord].topicName, 51);
-            printf("Enter 1st choice: ");
-            getString(records[*ctrRecord].C1, 31);
-            printf("Enter 2nd choice: ");
-            getString(records[*ctrRecord].C2, 31);
-            printf("Enter 3rd choice: ");
-            getString(records[*ctrRecord].C3, 31);
+                printf("\n\nEnter topic: ");
+                getString(records[*ctrRecord].Topic, 51);
+                printf("Enter 1st choice: ");
+                getString(records[*ctrRecord].C1, 31);
+                printf("Enter 2nd choice: ");
+                getString(records[*ctrRecord].C2, 31);
+                printf("Enter 3rd choice: ");
+                getString(records[*ctrRecord].C3, 31);
 
-            records[*ctrRecord].qNumber = *ctrRecord + 1;
+                records[*ctrRecord].Number = *ctrRecord + 1;
 
-            *ctrRecord += 1;
+                if (strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C1) == 0 ||
+                    strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C2) == 0 ||
+                    strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C3) == 0)
+                {
 
-            system("cls");
-            printf("Record Successfully Added!\n\n");
-            system("pause");
+                    *ctrRecord += 1;
+
+                    system("cls");
+                    printf("Record Successfully Added!\n\n");
+                    system("pause");
+
+                    answerMatch = true;
+                }
+
+                else
+                {
+
+                    system("cls");
+
+                    printf("Answer does not match any of the choices, try again.\n\n\n");
+
+                    system("pause");
+                    system("cls");
+                }
+
+            } while (answerMatch == false);
         }
 
         else
@@ -358,26 +381,272 @@ void addRecord(struct quizRecord *records, int *ctrRecord)
                 case 'Y':
                 case 'y':
                     returnMenu = true;
-                    cInputValid = true;
+                    inputValid = true;
                     break;
 
                 case 'N':
                 case 'n':
                     returnMenu = false;
-                    cInputValid = true;
+                    inputValid = true;
                     break;
 
                 default:
-                    cInputValid = false;
+                    inputValid = false;
                     break;
                 }
 
-            } while (cInputValid == false);
+            } while (inputValid == false);
         }
 
     } while (existingRecord == true && returnMenu == false);
 }
 
+/* This function is for editing existing records of the quiz.
+Precondition: Topic names are case sensitive.
+@param records is the array of structures for quiz records.
+@param ctrRecord is the value of the number of existing records.
+@param returnManageData is an option to return to manage data menu when opt enter a topic.
+@return void
+*/
+void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageData)
+{
+
+    int tempSize = *ctrRecord;
+    int numberInput;
+    int inputIndex;
+
+    char uniqueTopics[tempSize][51];
+
+    String50 topicInput;
+
+    bool inputValid = false;
+
+    if (*ctrRecord > 0){
+
+        // Copy all the topic names into a different string array.
+        for (int i = 0; i < tempSize; i++)
+        {
+            strcpy(uniqueTopics[i], records[i].Topic);
+        }
+
+        // Remove the duplicate topic names of the array.
+        for (int j = 0; j < tempSize; j++)
+        {
+
+            for (int k = j + 1; k < tempSize; k++)
+            {
+
+                if (strcmp(uniqueTopics[j], uniqueTopics[k]) == 0)
+                {
+
+                    for (int l = k; l < tempSize; l++)
+                    {
+
+                        strcpy(uniqueTopics[l], uniqueTopics[l + 1]);
+                    }
+
+                    tempSize -= 1;
+
+                    k--;
+                }
+            }
+        }
+
+        do
+        {
+            do
+            {
+                system("cls");
+                printf("Choose a topic or return to menu\n\n");
+
+                for (int i = 0; i < tempSize; i++)
+                {
+
+                    printf(" %d. %s\n", i + 1, uniqueTopics[i]);
+                }
+
+                printf("\n[%d] Return to menu\n", 0);
+
+                printf("\nEnter: ");
+                scanf("%s", topicInput);
+                
+                if (strcmp(topicInput, "0") == 0)
+                {
+
+                    inputValid = true;
+
+                }
+
+                for (int i = 0; i < tempSize; i++)
+                {
+
+                    if (strcmp(topicInput, uniqueTopics[i]) == 0)
+                    {
+
+                        inputValid = true;
+                    }
+                }
+
+                if (inputValid == false)
+                {
+
+                    system("cls");
+                    printf("Input does not match any of the given topics, try again.\n\n");
+                    system("pause");
+                }
+
+            } while (inputValid == false);
+            
+            if (strcmp(topicInput, "0") == 0)
+            {
+
+                *returnManageData = true;
+
+            }
+
+            else
+            {
+
+                system("cls");
+
+                do
+                {
+
+                    inputValid = false;
+
+                    for (int i = 0; i < *ctrRecord; i++)
+                    {
+
+                        if (strcmp(topicInput, records[i].Topic) == 0)
+                        {
+
+                            printf("[%d] %s\n", records[i].Number, records[i].Question);
+                        }
+                    }
+
+                    printf("\nChoose a question (Enter corresponding number): ");
+                    scanf("%d", &numberInput);
+
+                    for (int i = 0; i < *ctrRecord; i++)
+                    {
+
+                        if (numberInput == records[i].Number)
+                        {
+
+                            inputValid = true;
+
+                            inputIndex = i;
+                        }
+                    }
+
+                    if (inputValid == false)
+                    {
+
+                        system("cls");
+                        printf("Input does not match with any of the given question numbers, try again\n\n");
+                        system("pause");
+                        system("cls");
+                    }
+
+                } while (inputValid == false);
+
+                do
+                {
+
+                    inputValid = false;
+                    system("cls");
+
+                    printf("Topic: %s\n[%d] %s\nC1: %s\nC2: %s\nC3: %s\n\nAnswer: %s", records[inputIndex].Topic,
+                        records[inputIndex].Number, records[inputIndex].Question,
+                        records[inputIndex].C1, records[inputIndex].C2,
+                        records[inputIndex].C3, records[inputIndex].Answer);
+
+                    printf("\n----------------------\nChoose which field to modify: \n\n");
+                    printf("[1] Topic");
+                    printf("\n[2] Question");
+                    printf("\n[3] 1st Choice");
+                    printf("\n[4] 2nd Choice");
+                    printf("\n[5] 3rd Choice");
+                    printf("\n[6] Answer");
+
+                    printf("\n\nEnter: ");
+                    scanf("%d", &numberInput);
+
+                    switch (numberInput)
+                    {
+
+                    case 1:
+                        printf("\nEnter topic: ");
+                        getString(records[inputIndex].Topic, 51);
+                        inputValid = true;
+                        break;
+
+                    case 2:
+                        printf("\nEnter Question: ");
+                        getString(records[inputIndex].Question, 151);
+                        inputValid = true;
+                        break;
+
+                    case 3:
+                        printf("\nEnter C1: ");
+                        getString(records[inputIndex].C1, 31);
+                        inputValid = true;
+                        break;
+
+                    case 4:
+                        printf("\nEnter C2: ");
+                        getString(records[inputIndex].C2, 31);
+                        inputValid = true;
+                        break;
+
+                    case 5:
+                        printf("\nEnter C3: ");
+                        getString(records[inputIndex].C3, 31);
+                        inputValid = true;
+                        break;
+
+                    case 6:
+                        printf("\nEnter Answer: ");
+                        getString(records[inputIndex].Answer, 31);
+                        inputValid = true;
+                        break;
+
+                    default:
+                        inputValid = false;
+                    }
+
+                    if (inputValid == true)
+                    {
+
+                        system("cls");
+                        printf("Edit Successful\n\n");
+                        system("pause");
+                    }
+
+                    else
+                    {
+
+                        system("cls");
+                        printf("Input does not match any of the corresponding numbers, try again.\n\n");
+                        system("pause");
+                    }
+
+                } while (inputValid == false);
+            }
+
+        } while (*returnManageData == false);
+
+    }
+
+    else{
+        
+        system("cls");
+        printf("There are no records to edit.\n\n");
+        system("pause");
+        *returnManageData = true;
+
+    }
+}
 /* This function is the menu for admins which manages the data of the program
 Precondition: cInput from int main() must be 'm' or 'M'
 @param records is the array of structures for quiz records.
@@ -434,12 +703,12 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
             case 'A':
                 addRecord(records, ctrRecord);
                 switchValid = true;
-                *returnMenu = true;
+                returnManageData = true;
                 break;
 
             case 'e':
             case 'E':
-                // function
+                editRecord(records, ctrRecord, &returnManageData);
                 switchValid = true;
                 break;
 
@@ -464,6 +733,7 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
             case 'r':
             case 'R':
                 *returnMenu = true;
+                returnManageData = false;
                 switchValid = true;
                 break;
 
