@@ -260,9 +260,10 @@ void adminRegistration(String30 password, String30 tempPassword, String30 curren
 Precondition: Assume that the input is case sensitive when checking existing records.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
+@param returnManageData is an option to return to manage data menu.
 @return void
 */
-void addRecord(struct quizRecord *records, int *ctrRecord)
+void addRecord(struct quizRecord *records, int *ctrRecord, bool* returnManageData)
 {
 
     system("cls");
@@ -270,7 +271,6 @@ void addRecord(struct quizRecord *records, int *ctrRecord)
     String150 tempQuestion;
     String30 tempAnswer;
     bool existingRecord = false;
-    bool returnMenu = false;
     bool inputValid = false;
     bool answerMatch = false;
     char cInput;
@@ -279,20 +279,26 @@ void addRecord(struct quizRecord *records, int *ctrRecord)
     {
         system("cls");
 
-        printf("Enter a question: ");
+        printf("Enter a question\n\nor\n\n[0] to exit");
+        printf("\n\nEnter: ");
         getString(tempQuestion, 151);
-        printf("\nEnter the answer: ");
-        getString(tempAnswer, 31);
 
-        existingRecord = false;
+        if (strcmp(tempQuestion, "0") == 0){
 
-        for (int i = 0; i < SIZE; i++)
-        {
+            *returnManageData = true;
+        }
 
-            if (strcmp(tempQuestion, records[i].Question) == 0)
+        else{
+
+            printf("\nEnter the answer: ");
+            getString(tempAnswer, 31);
+            
+            existingRecord = false;
+        
+            for (int i = 0; i < SIZE; i++)
             {
 
-                if (strcmp(tempAnswer, records[i].Answer) == 0)
+                if (strcmp(tempQuestion, records[i].Question) == 0)
                 {
 
                     system("cls");
@@ -308,108 +314,111 @@ void addRecord(struct quizRecord *records, int *ctrRecord)
                     system("pause");
 
                     existingRecord = true;
+
                 }
             }
-        }
 
-        if (existingRecord == false)
-        {
-
-            system("cls");
-
-            strcpy(records[*ctrRecord].Question, tempQuestion);
-            strcpy(records[*ctrRecord].Answer, tempAnswer);
-
-            do
-            {
-                printf("%s", records[*ctrRecord].Question);
-                printf("\n%s", records[*ctrRecord].Answer);
-
-                printf("\n\nEnter topic: ");
-                getString(records[*ctrRecord].Topic, 21);
-                printf("Enter 1st choice: ");
-                getString(records[*ctrRecord].C1, 31);
-                printf("Enter 2nd choice: ");
-                getString(records[*ctrRecord].C2, 31);
-                printf("Enter 3rd choice: ");
-                getString(records[*ctrRecord].C3, 31);
-
-                records[*ctrRecord].Number = *ctrRecord + 1;
-
-                if (strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C1) == 0 ||
-                    strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C2) == 0 ||
-                    strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C3) == 0)
-                {
-
-                    *ctrRecord += 1;
-
-                    system("cls");
-                    printf("Record Successfully Added!\n\n");
-                    system("pause");
-
-                    answerMatch = true;
-                }
-
-                else
-                {
-
-                    system("cls");
-
-                    printf("Answer does not match any of the choices, try again.\n\n\n");
-
-                    system("pause");
-                    system("cls");
-                }
-
-            } while (answerMatch == false);
-        }
-
-        else
-        {
-
-            do
+            if (existingRecord == false)
             {
 
                 system("cls");
 
-                printf("Return to MANAGE DATA?\n");
-                printf("[Y] if yes");
-                printf("\n[N] if no");
+                strcpy(records[*ctrRecord].Question, tempQuestion);
+                strcpy(records[*ctrRecord].Answer, tempAnswer);
 
-                printf("\n\nEnter: ");
-                scanf(" %c", &cInput);
+                do
+                {
+                    printf("%s", records[*ctrRecord].Question);
+                    printf("\n%s", records[*ctrRecord].Answer);
 
-                switch (cInput)
+                    printf("\n\nEnter topic: ");
+                    getString(records[*ctrRecord].Topic, 21);
+                    printf("Enter 1st choice: ");
+                    getString(records[*ctrRecord].C1, 31);
+                    printf("Enter 2nd choice: ");
+                    getString(records[*ctrRecord].C2, 31);
+                    printf("Enter 3rd choice: ");
+                    getString(records[*ctrRecord].C3, 31);
+
+                    records[*ctrRecord].Number = *ctrRecord + 1;
+
+                    if (strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C1) == 0 ||
+                        strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C2) == 0 ||
+                        strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C3) == 0)
+                    {
+
+                        *ctrRecord += 1;
+
+                        system("cls");
+                        printf("Record Successfully Added!\n\n");
+                        system("pause");
+
+                        answerMatch = true;
+                        *returnManageData = true;
+                    }
+
+                    else
+                    {
+
+                        system("cls");
+
+                        printf("Answer does not match any of the choices, try again.\n\n\n");
+
+                        system("pause");
+                        system("cls");
+                    }
+
+                } while (answerMatch == false);
+            }
+
+            else
+            {
+
+                do
                 {
 
-                case 'Y':
-                case 'y':
-                    returnMenu = true;
-                    inputValid = true;
-                    break;
+                    system("cls");
 
-                case 'N':
-                case 'n':
-                    returnMenu = false;
-                    inputValid = true;
-                    break;
+                    printf("Return to MANAGE DATA?\n");
+                    printf("[Y] if yes");
+                    printf("\n[N] if no");
 
-                default:
-                    inputValid = false;
-                    break;
-                }
+                    printf("\n\nEnter: ");
+                    scanf(" %c", &cInput);
 
-            } while (inputValid == false);
+                    switch (cInput)
+                    {
+
+                    case 'Y':
+                    case 'y':
+                        *returnManageData = true;
+                        inputValid = true;
+                        break;
+
+                    case 'N':
+                    case 'n':
+                        *returnManageData = false;
+                        inputValid = true;
+                        break;
+
+                    default:
+                        inputValid = false;
+                        break;
+                    }
+
+                } while (inputValid == false);
+            }
         }
+       
 
-    } while (existingRecord == true && returnMenu == false);
+    } while (existingRecord == true && *returnManageData == false);
 }
 
 /* This function is for editing existing records of the quiz.
 Precondition: Topic names are case sensitive.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
-@param returnManageData is an option to return to manage data menu when opt enter a topic.
+@param returnManageData is an option to return to manage data menu.
 @return void
 */
 void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageData)
@@ -686,7 +695,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 Precondition: Topic names are case sensitive.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
-@param returnManageData is an option to return to manage data menu when opt enter a topic.
+@param returnManageData is an option to return to manage data menu.
 @return void
 */
 void deleteRecord(struct quizRecord *records, int *ctrRecord,
@@ -953,6 +962,7 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool* returnManage
     FILE *fp;
 
     bool validInput = false;
+    bool existingRecord = false;
 
     do
     {
@@ -977,9 +987,11 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool* returnManage
         //Else, proceed with importing file to program.
         else{
 
+            existingRecord = false;
+
             if ((fp = fopen(filename, "r")) != 0)
             {
-
+                
                 readString(fp, temp.Topic, 21);
                 fscanf(fp, "%d ", &temp.Number);
                 readString(fp, temp.Question, 151);
@@ -988,24 +1000,44 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool* returnManage
                 readString(fp, temp.C3, 31);
                 readString(fp, temp.Answer, 31);
 
-                records[*ctrRecord] = temp;
+                for (int i = 0; i < *ctrRecord; i++){
 
-                system("cls");
-                printf("Import Successful.\n\n------------------------------\n");
+                    if (strcmp(records[i].Question, temp.Question) == 0){
 
-                printf("[T]  %s\n\n[#]  %d\n\n[Q]  %s\n\n[C1] %s\n\n[C2] %s\n\n[C3] %s\n\n[A]  %s\n------------------------------\n\n", records[*ctrRecord].Topic,
-                        records[*ctrRecord].Number, records[*ctrRecord].Question,
-                        records[*ctrRecord].C1, records[*ctrRecord].C2,
-                        records[*ctrRecord].C3, records[*ctrRecord].Answer);
-                        
-                system("pause");
+                        existingRecord = true;
+                    }
+                }
 
-                *ctrRecord += 1;
+                if (existingRecord != true){
 
-                validInput = true;
-                *returnManageData = true;
+                    records[*ctrRecord] = temp;
 
-                fclose (fp);
+                    system("cls");
+                    printf("Import Successful.\n\n------------------------------\n");
+
+                    printf("[T]  %s\n\n[#]  %d\n\n[Q]  %s\n\n[C1] %s\n\n[C2] %s\n\n[C3] %s\n\n[A]  %s\n------------------------------\n\n", records[*ctrRecord].Topic,
+                            records[*ctrRecord].Number, records[*ctrRecord].Question,
+                            records[*ctrRecord].C1, records[*ctrRecord].C2,
+                            records[*ctrRecord].C3, records[*ctrRecord].Answer);
+                            
+                    system("pause");
+
+                    *ctrRecord += 1;
+
+                    validInput = true;
+                    *returnManageData = true;
+
+                    fclose (fp);
+
+                }
+
+                else{
+
+                    system("cls");
+                    printf("Record already exists.\n\n");
+                    system("pause");
+                }
+                
 
             }
 
@@ -1079,9 +1111,8 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
 
             case 'a':
             case 'A':
-                addRecord(records, ctrRecord);
+                addRecord(records, ctrRecord, &returnManageData);
                 switchValid = true;
-                returnManageData = true;
                 break;
 
             case 'e':
