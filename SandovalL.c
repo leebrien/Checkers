@@ -32,6 +32,13 @@ struct quizRecord
     String30 Answer;
 };
 
+// This struct holds the components of a player
+struct playerRecord
+{
+    String30 playerName;
+    int playerScore;
+};
+
 /* This function is for getting the password of the admin.
 Precondition: The length of the password is limited to 30 characters
 @param password This holds the inputted string as a password
@@ -981,7 +988,7 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
 
     struct quizRecord temp;
 
-    char checkEOF;
+    int checkEOF;
 
     FILE *fp;
 
@@ -1041,7 +1048,7 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
                         readString(fp, temp.C3, 31);
                         readString(fp, temp.Answer, 31);
 
-                        if (fscanf(fp, "%c", &checkEOF) != EOF && fscanf(fp, "% c", &checkEOF) != EOF)
+                        if (fscanf(fp, "%d", &checkEOF) != EOF && fscanf(fp, "%d", &checkEOF) != EOF)
                         {
 
                             multipleRecord = true;
@@ -1134,19 +1141,10 @@ Precondition: file name is limited to 30 characters.
 */
 void exportRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageData)
 {
-    int tempSize = *ctrRecord;
-    int numberInput;
-    int inputIndex;
-
-    char uniqueTopics[tempSize][21];
-    char cInputExport;
 
     FILE *fp;
 
-    String20 topicInput;
     String20 filename;
-
-    bool inputValid = false;
 
     if (*ctrRecord > 0)
     {
@@ -1159,7 +1157,7 @@ void exportRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
         if (strcmp(filename, "0") == 0)
         {
 
-            *returnManageData;
+            *returnManageData = true;
         }
 
         else
@@ -1313,31 +1311,61 @@ void randArray(int topicQuestions, int tempArray[topicQuestions])
         tempArray[j] = temp;
     }
 }
+
+/* This function sorts the scores of existing player in decreasing order
+@param gamePlayer is the array of structures for player records.
+@param ctrPlayer is the number of existing players.
+@return
+*/
+void sortScores(struct playerRecord *gamePlayer, int *ctrPlayer)
+{
+
+    struct playerRecord temp;
+
+    for (int i = 0; i < *ctrPlayer; i++)
+    {
+
+        for (int j = i + 1; j < *ctrPlayer; j++)
+        {
+
+            if (gamePlayer[i].playerScore < gamePlayer[j].playerScore)
+            {
+
+                temp = gamePlayer[i];
+                gamePlayer[i] = gamePlayer[j];
+                gamePlayer[j] = temp;
+            }
+        }
+    }
+}
 /* This function is the quiz game itself.
 Precondition: cInput from playGame() must be 'p' or 'P'
 @param records is the array of structures for quiz records.
-@param playerName is the name of the player.
 @param ctrRecord is the value of the number of existing records.
 @param returnMenu This is for choosing if the user wishes to return to the
        main menu after an incorrect password input.
-@param quizScore is the current score of the player.
-@param fileScore is the accumulated score of the player
+@param currentScore is the current score of the player.
+@param gamePlayer is the array of structures for player records.
+@param ctrPlayer is the number of existing players.
 @return void
 */
-void startGame(struct quizRecord* records, String30 playerName, int* ctrRecord, bool* returnMenu, int* quizScore, int* fileScore)
+void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int *currentScore, struct playerRecord *gamePlayer, int *ctrPlayer)
 {
 
     int tempSize = *ctrRecord;
     int topicQuestions = 0;
     int tempArray[20];
+    int playerIndex;
 
     char uniqueTopics[tempSize][21];
 
+    String20 playerName;
     String30 quizAnswer;
 
     bool inputValid;
     bool topicMatch = false;
     bool endGame = false;
+    bool existingPlayer = false;
 
     if (*ctrRecord > 0)
     {
@@ -1345,6 +1373,26 @@ void startGame(struct quizRecord* records, String30 playerName, int* ctrRecord, 
 
         printf("What is your name?: ");
         getString(playerName, 31);
+
+        for (int i = 0; i < *ctrPlayer; i++)
+        {
+
+            if (strcmp(playerName, gamePlayer[i].playerName) == 0)
+            {
+
+                existingPlayer = true;
+                playerIndex = i;
+            }
+        }
+
+        if (existingPlayer == false)
+        {
+
+            strcpy(gamePlayer[*ctrPlayer].playerName, playerName);
+            gamePlayer[*ctrPlayer].playerScore = 0;
+
+            *ctrPlayer += 1;
+        }
 
         printf("\n");
         system("pause");
@@ -1391,7 +1439,18 @@ void startGame(struct quizRecord* records, String30 playerName, int* ctrRecord, 
 
                 system("cls");
 
-                printf("Score: %d\n--------------------\n\n", *quizScore);
+                if (existingPlayer == true)
+                {
+
+                    printf("%s's score: %d\n--------------------\n\n", playerName, gamePlayer[playerIndex].playerScore);
+                }
+
+                else
+                {
+
+                    printf("%s's score: %d\n--------------------\n\n", playerName, gamePlayer[*ctrPlayer - 1].playerScore);
+                }
+
                 printf("Choose a topic\n\n");
 
                 // Display available topics and option to end game.
@@ -1442,7 +1501,19 @@ void startGame(struct quizRecord* records, String30 playerName, int* ctrRecord, 
             {
 
                 system("cls");
-                printf("Your score: %d\n\n", *quizScore);
+
+                if (existingPlayer == true)
+                {
+
+                    printf("%s's score: %d\n\n", playerName, gamePlayer[playerIndex].playerScore);
+                }
+
+                else
+                {
+
+                    printf("%s's score: %d\n\n", playerName, gamePlayer[*ctrPlayer - 1].playerScore);
+                }
+
                 system("pause");
             }
 
@@ -1470,7 +1541,19 @@ void startGame(struct quizRecord* records, String30 playerName, int* ctrRecord, 
 
                     if (tempArray[0] == records[i].Number)
                     {
-                        printf("Score: %d\n--------------------\n\n", *quizScore);
+
+                        if (existingPlayer == true)
+                        {
+
+                            printf("%s's score: %d\n--------------------\n\n", playerName, gamePlayer[playerIndex].playerScore);
+                        }
+
+                        else
+                        {
+
+                            printf("%s's score: %d\n--------------------\n\n", playerName, gamePlayer[*ctrPlayer - 1].playerScore);
+                        }
+
                         printf("%d. %s\n\n", records[i].Number, records[i].Question);
                         printf("C1) %s\n", records[i].C1);
                         printf("C2) %s\n", records[i].C2);
@@ -1482,11 +1565,21 @@ void startGame(struct quizRecord* records, String30 playerName, int* ctrRecord, 
                         if (strcmp(quizAnswer, records[i].Answer) == 0)
                         {
 
-                            *quizScore += 1;
-                            *fileScore += 1;
+                            if (existingPlayer == true)
+                            {
+
+                                gamePlayer[playerIndex].playerScore += 1;
+                            }
+
+                            else
+                            {
+
+                                gamePlayer[*ctrPlayer - 1].playerScore += 1;
+                            }
+                            *currentScore += 1;
 
                             system("cls");
-                            printf("Correct! your scsore is %d point/s.\n\n", *quizScore);
+                            printf("Correct! your score gained a point.\n\n");
                             system("pause");
                         }
 
@@ -1515,18 +1608,30 @@ void startGame(struct quizRecord* records, String30 playerName, int* ctrRecord, 
 /* This function displays the player's name and scores from an imported file and the
    current score accumulated from the program.
 Precondition: cInput from playGame() must be 'p' or 'P'
-@param playerName is the name of the player.
-@param quizScore is the current score of the player.
-@param fileScore is the accumulated score of the player.
+@param currentScore is the current score of the player.
+@param gamePlayer is the array of structures for player records.
+@param ctrPlayer is the number of existing players.
 @return void
 */
-void viewScores(String30 playerName, int* quizScore, int* fileScore)
+void viewScores(int *currentScore, struct playerRecord *gamePlayer, int *ctrPlayer)
 {
 
     system("cls");
-    printf("1.\tName: %s\n", playerName);
-    printf("2.\tScore (Current): %d\n", *quizScore);
-    printf("3.\tScore (Accumulated): %d\n\n", *fileScore);
+
+    int rowNumber = 1;
+
+    // Used spaces since \t does not work.
+    printf("\nRanking");
+    printf("    Name");
+    printf("           Score\n\n");
+
+    for (int i = 0; i < *ctrPlayer; i++)
+    {
+
+        printf("  #%-8d%-15s%-5d\n", rowNumber, gamePlayer[i].playerName, gamePlayer[i].playerScore);
+
+        rowNumber += 1;
+    }
 
     system("pause");
 }
@@ -1537,29 +1642,43 @@ Precondition: cInput from int main() must be 'p' or 'P'
 @param returnMenu This is for choosing if the user wishes to return to the
        main menu after an incorrect password input.
 @param ctrRecord is the value of the number of existing records.
-@param quizScore is the score of the player.
+@param currentScore is the score of the player.
+@param gamePlayer is the array of structures for player records.
 @return void
 */
-void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int *quizScore)
+void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int *currentScore, struct playerRecord *gamePlayer)
 {
 
     char cInput;
+    char checkNL;
 
-    int fileScore;
+    int ctrPlayer = 0;
+    int checkEOF;
 
     bool validInput = false;
-    String30 playerName;
 
-    FILE* fp;
+    FILE *fp;
 
-    fp = fopen("scores.txt", "r");
+    fp = fopen("score.txt", "r");
 
-    fscanf(fp, "%d", &fileScore);
+    do
+    {
+
+        readString(fp, gamePlayer[ctrPlayer].playerName, 21);
+        fscanf(fp, " %d", &gamePlayer[ctrPlayer].playerScore);
+        fscanf(fp, "%c", &checkNL);
+
+        ctrPlayer += 1;
+
+    } while (fscanf(fp, "%d", &checkEOF) != EOF);
 
     fclose(fp);
 
     do
     {
+
+        sortScores(gamePlayer, &ctrPlayer);
+
         system("cls");
 
         printf("[P] to play");
@@ -1574,14 +1693,14 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
 
         case 'p':
         case 'P':
-            startGame(records, playerName, ctrRecord, returnMenu, quizScore, &fileScore);
+            startGame(records, ctrRecord, returnMenu, currentScore, gamePlayer, &ctrPlayer);
             validInput = true;
             *returnMenu = false;
             break;
 
         case 'v':
         case 'V':
-            viewScores(playerName, quizScore, &fileScore);
+            viewScores(currentScore, gamePlayer, &ctrPlayer);
             validInput = true;
             *returnMenu = false;
             break;
@@ -1589,13 +1708,17 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
         case 'e':
         case 'E':
 
-            fp = fopen("scores.txt", "w");
+            fp = fopen("score.txt", "w");
 
-            fprintf(fp, "%d", fileScore);
+            for (int i = 0; i < ctrPlayer; i++)
+            {
+
+                fprintf(fp, "%s\n%d\n\n", gamePlayer[i].playerName, gamePlayer[i].playerScore);
+            }
 
             fclose(fp);
 
-            *quizScore = 0;
+            *currentScore = 0;
             *returnMenu = true;
             validInput = true;
             break;
@@ -1620,12 +1743,13 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
 @param password This holds the inputted string as a password.
 @param tempPassword is used to compare the password input.
 @param currentPassword is used if user will return to manage data.
-@param quizScore is the score of the player.
+@param currentScore is the score of the player.
+@param gamePlayer is the array of structures for player records.
 @return void
 */
 void enterMenu(struct quizRecord *records, String30 password,
                String30 tempPassword, String30 currentPassword,
-               int *quizScore)
+               int *currentScore, struct playerRecord *gamePlayer)
 {
 
     int ctrRecord = 0;
@@ -1649,7 +1773,7 @@ void enterMenu(struct quizRecord *records, String30 password,
 
         case 'p':
         case 'P':
-            playGame(records, &returnMenu, &ctrRecord, quizScore);
+            playGame(records, &returnMenu, &ctrRecord, currentScore, gamePlayer);
             validInput = true;
             break;
 
@@ -1672,14 +1796,16 @@ int main()
     String30 password;
     String30 tempPassword;
 
-    int quizScore = 0;
+    int currentScore = 0;
 
     // This will change once user registers.
     String30 currentPassword = "N/A";
 
     struct quizRecord records[SIZE];
 
-    enterMenu(records, password, tempPassword, currentPassword, &quizScore);
+    struct playerRecord gamePlayer[SIZE];
+
+    enterMenu(records, password, tempPassword, currentPassword, &currentScore, gamePlayer);
 
     return 0;
 }
