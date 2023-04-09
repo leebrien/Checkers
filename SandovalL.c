@@ -1537,13 +1537,13 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu,
                 if (existingPlayer == true)
                 {
 
-                    printf("%s's score: %d\n--------------------\n\n", *currentScore);
+                    printf("%s's score: %d\n--------------------\n\n", playerName, *currentScore);
                 }
 
                 else
                 {
 
-                    printf("%s's score: %d\n--------------------\n\n", *currentScore);
+                    printf("%s's score: %d\n--------------------\n\n", playerName, *currentScore);
                 }
 
                 printf("Choose a topic\n\n");
@@ -1660,13 +1660,13 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu,
                         if (existingPlayer == true)
                         {
 
-                            printf("%s's score: %d\n--------------------\n\n", *currentScore);
+                            printf("%s's score: %d\n--------------------\n\n", playerName, *currentScore);
                         }
 
                         else
                         {
 
-                            printf("%s's score: %d\n--------------------\n\n", *currentScore);
+                            printf("%s's score: %d\n--------------------\n\n", playerName, *currentScore);
                         }
 
                         printf("%d. %s\n\n", records[i].Number, records[i].Question);
@@ -1902,6 +1902,7 @@ void enterMenu(struct quizRecord *records, String30 password,
         printf("This is a General Knowledge Quiz Game!");
         printf("\n\nPress [P] to play.\n\n");
         printf("Press [M] to manage data\n\n");
+        printf("Press [E] to exit\n\n");
 
         // Prompt to play or access admin.
         printf("Enter: ");
@@ -1923,6 +1924,17 @@ void enterMenu(struct quizRecord *records, String30 password,
             returnMenu = false;
             manageData(records, password, tempPassword, currentPassword,
                        &returnMenu, &ctrRecord);
+            break;
+
+        case 'e':
+        case 'E':
+            system("cls");
+            printf("Goodbye!\n\n");
+            system("pause");
+            system("cls");
+            validInput = true;
+            returnMenu = false;
+
             break;
 
         default:
