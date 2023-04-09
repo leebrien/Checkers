@@ -20,7 +20,7 @@ typedef char String20[21];
 typedef char String150[151];
 typedef char String30[31];
 
-// This struct holds the components of a question
+// This struct holds the components of a question.
 struct quizRecord
 {
     String20 Topic;
@@ -32,7 +32,7 @@ struct quizRecord
     String30 Answer;
 };
 
-// This struct holds the components of a player
+// This struct holds the components of a player.
 struct playerRecord
 {
     String30 playerName;
@@ -40,8 +40,8 @@ struct playerRecord
 };
 
 /* This function is for getting the password of the admin.
-Precondition: The length of the password is limited to 30 characters
-@param password This holds the inputted string as a password
+Precondition: The length of the password is limited to 30 characters.
+@param password This holds the inputted string as a password.
 @return void
 */
 void getPassword(String30 password)
@@ -53,6 +53,7 @@ void getPassword(String30 password)
     while ((ch = getch()) != '\r')
     {
 
+        // Delete character when 'backspace' is entered.
         if (ch == '\b')
         {
 
@@ -61,6 +62,7 @@ void getPassword(String30 password)
             i -= 1;
         }
 
+        // Print '*' which represents a masked character.
         else
         {
             password[i] = ch;
@@ -68,12 +70,15 @@ void getPassword(String30 password)
             printf("*");
         }
     }
+
+    // Set last byte to null.
     password[i] = '\0';
 }
 
 /* This function is for getting the string for the record.
-Precondition: The length of the input is limited to 200 characters
-@param password This holds the inputted string as a password
+Precondition: The length of the string is limited to 200 characters.
+@param string is holds the string input.
+@param nSize is the size of the string depending on what string is asked.
 @return void
 */
 void getString(char string[], int nSize)
@@ -113,12 +118,14 @@ void getString(char string[], int nSize)
 
     } while (ch != '\n');
 
+    // If there is a ' ' typo at the end of the string, replace it with '\0'.
     if (stringInput[strlen(stringInput) - 1] == ' ')
     {
 
         stringInput[strlen(stringInput) - 1] = '\0';
     }
 
+    // Copy input to string parameter.
     strcpy(string, stringInput);
 }
 
@@ -128,11 +135,12 @@ Precondition: The length of the password is limited to 30 characters
 @param currentPassword is used if user will return to manage data.
 @param returnMenu This is for choosing if the user wishes to return to the
        main menu after an incorrect password input.
-@param bContinue is used to signal if login/registration was successful, thus continue through
-       managing the data.
+@param bContinue is used to signal if login/registration was
+       successful, thus continue through managing the data.
 @return void
 */
-void adminLogin(String30 password, String30 currentPassword, bool *returnMenu, bool *bContinue)
+void adminLogin(String30 password, String30 currentPassword,
+                bool *returnMenu, bool *bContinue)
 {
 
     // To signal validity of input for the whole function.
@@ -143,12 +151,14 @@ void adminLogin(String30 password, String30 currentPassword, bool *returnMenu, b
 
     int dInput;
 
+    // Loop until input is valid.
     do
     {
         printf("\n=== Admin Login ===\n\n");
         printf("Enter password: \n");
         getPassword(password);
 
+        // If input matches the password, allow access.
         if (strcmp(password, currentPassword) == 0)
         {
 
@@ -160,6 +170,7 @@ void adminLogin(String30 password, String30 currentPassword, bool *returnMenu, b
             validInput = true;
         }
 
+        // Else, display invalidity and give an option to exit.
         else if (strcmp(password, currentPassword) != 0)
         {
 
@@ -199,17 +210,19 @@ Precondition: The length of the password is limited to 30 characters
 @param currentPassword is used if user will return to manage data.
 @param returnMenu This is for choosing if the user wishes to return to the
        main menu after an incorrect password input.
-@param bContinue is used to signal if login/registration was successful, thus continue through
-       managing the data.
+@param bContinue is used to signal if login/registration was
+       successful, thus continue through managing the data.
 @return void
 */
-void adminRegistration(String30 password, String30 tempPassword, String30 currentPassword, bool *returnMenu, bool *bContinue)
+void adminRegistration(String30 password, String30 tempPassword,
+                       String30 currentPassword, bool *returnMenu, bool *bContinue)
 {
     bool validInput = false;
     bool validInput2 = false;
 
     int dInput;
 
+    // Loop until valid.
     do
     {
         printf("\n=== Admin Registration ===\n\n");
@@ -219,6 +232,7 @@ void adminRegistration(String30 password, String30 tempPassword, String30 curren
         printf("\nConfirm your password: \n");
         getPassword(tempPassword);
 
+        // Confirms if both input matches.
         if (strcmp(password, tempPassword) == 0)
         {
 
@@ -226,11 +240,12 @@ void adminRegistration(String30 password, String30 tempPassword, String30 curren
             system("pause");
             system("cls");
 
-            *bContinue = true;
+            *bContinue = true; // Gives access to manage data.
             validInput = true;
-            strcpy(currentPassword, password);
+            strcpy(currentPassword, password); // Copy input for future logins.
         }
 
+        // Else, display invalidity and give an option to exit.
         else if (strcmp(password, tempPassword) != 0)
         {
 
@@ -282,9 +297,11 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
     bool answerMatch = false;
     char cInput;
 
+    // If the number of records does not reach the limit which is 20, continue.
     if (*ctrRecord < 20)
     {
 
+        // Loop until record does not exist or return menu.
         do
         {
             system("cls");
@@ -293,12 +310,14 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
             printf("\n\nEnter: ");
             getString(tempQuestion, 151);
 
+            // Signal return to menu.
             if (strcmp(tempQuestion, "0") == 0)
             {
 
                 *returnManageData = true;
             }
 
+            // Else, continue with add record.
             else
             {
 
@@ -307,6 +326,7 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
 
                 existingRecord = false;
 
+                // Checks if the input for the question already exists.
                 for (int i = 0; i < SIZE; i++)
                 {
 
@@ -329,6 +349,7 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
                     }
                 }
 
+                // Else, continue.
                 if (existingRecord == false)
                 {
 
@@ -337,7 +358,9 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
                     strcpy(records[*ctrRecord].Question, tempQuestion);
                     strcpy(records[*ctrRecord].Answer, tempAnswer);
 
-                    do
+                    // Prompt to enter topic, and choices.
+
+                    do // Loop until answer matches one of the choices.
                     {
                         printf("%s", records[*ctrRecord].Question);
                         printf("\n%s", records[*ctrRecord].Answer);
@@ -351,14 +374,16 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
                         printf("Enter 3rd choice: ");
                         getString(records[*ctrRecord].C3, 31);
 
+                        // Set question number based on the current number of questions.
                         records[*ctrRecord].Number = *ctrRecord + 1;
 
+                        // Confirm if the answer exists within the choices.
                         if (strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C1) == 0 ||
                             strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C2) == 0 ||
                             strcmp(records[*ctrRecord].Answer, records[*ctrRecord].C3) == 0)
                         {
 
-                            *ctrRecord += 1;
+                            *ctrRecord += 1; // Increase the size of the record array (Amount of records).
 
                             system("cls");
                             printf("Record Successfully Added!\n\n");
@@ -382,6 +407,7 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
                     } while (answerMatch == false);
                 }
 
+                // Give an option to retry or exit if record exists.
                 else
                 {
 
@@ -424,6 +450,7 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
         } while (existingRecord == true && *returnManageData == false);
     }
 
+    // Display a message if record limit is reached.
     else
     {
 
@@ -455,6 +482,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 
     bool inputValid = false;
 
+    // Confirm if there is atleast one existing record.
     if (*ctrRecord > 0)
     {
 
@@ -464,7 +492,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
             strcpy(uniqueTopics[i], records[i].Topic);
         }
 
-        // Remove the duplicate topic names of the array.
+        // Remove the duplicate topic names of the temporary array.
         for (int j = 0; j < tempSize; j++)
         {
 
@@ -505,12 +533,14 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
                 printf("\nEnter: ");
                 getString(topicInput, 31);
 
+                // If input is '0', input is valid.
                 if (strcmp(topicInput, "0") == 0)
                 {
 
                     inputValid = true;
                 }
 
+                // If input matches any of the topics, input is valid.
                 for (int i = 0; i < tempSize; i++)
                 {
 
@@ -521,6 +551,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
                     }
                 }
 
+                // Else, display invalidity.
                 if (inputValid == false)
                 {
 
@@ -531,12 +562,14 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 
             } while (inputValid == false);
 
+            // If input is '0', exit.
             if (strcmp(topicInput, "0") == 0)
             {
 
                 *returnManageData = true;
             }
 
+            // Continue if not.
             else
             {
 
@@ -547,6 +580,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 
                     inputValid = false;
 
+                    // Give an option to enter a question to edit or to return to menu.
                     printf("\nChoose a question (Enter corresponding number)\n\n");
 
                     for (int i = 0; i < *ctrRecord; i++)
@@ -577,6 +611,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
                         for (int i = 0; i < *ctrRecord; i++)
                         {
 
+                            // Confirm if input matches any of the topics.
                             if (strcmp(topicInput, records[i].Topic) == 0)
                             {
                                 if (numberInput == records[i].Number)
@@ -584,12 +619,13 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 
                                     inputValid = true;
 
-                                    inputIndex = i;
+                                    inputIndex = i; // Get the index of the topic.
                                 }
                             }
                         }
                     }
 
+                    // Display invalidity.
                     if (inputValid == false)
                     {
 
@@ -601,6 +637,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 
                 } while (inputValid == false);
 
+                // If input does not signal return, continue modification.
                 if (numberInput != 0)
                 {
                     do
@@ -608,6 +645,8 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 
                         inputValid = false;
                         system("cls");
+
+                        // Prompt to enter which field to modify.
 
                         printf("Topic: %s\n[%d] %s\nC1: %s\nC2: %s\nC3: %s\n\nAnswer: %s",
                                records[inputIndex].Topic, records[inputIndex].Number,
@@ -705,6 +744,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
         } while (*returnManageData == false);
     }
 
+    // Display message if there is no record.
     else
     {
 
@@ -737,6 +777,7 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
 
     bool inputValid = false;
 
+    // Confirm if there is atleast one existing record.
     if (*ctrRecord > 0)
     {
 
@@ -773,6 +814,8 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
         {
             do
             {
+                // Give an option to choose a topic to delete or to return to menu.
+
                 system("cls");
                 printf("Choose a topic or return to menu\n\n");
 
@@ -813,6 +856,7 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
 
             } while (inputValid == false);
 
+            // If input is '0', signal return.
             if (strcmp(topicInput, "0") == 0)
             {
 
@@ -829,6 +873,7 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
 
                     inputValid = false;
 
+                    // Display available questions and their corresponding numbers.
                     for (int i = 0; i < *ctrRecord; i++)
                     {
 
@@ -839,6 +884,7 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
                         }
                     }
 
+                    // Prompt to input a question number and confirm validity.
                     printf("\nChoose a question (Enter corresponding number): ");
                     scanf("%d", &numberInput);
 
@@ -871,6 +917,9 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
 
                 do
                 {
+
+                    // Prompt for confirmation.
+
                     system("cls");
                     printf("\nAre you sure you want to delete this record?");
                     printf("\n[Y] Yes\n[N] No\n\n");
@@ -881,6 +930,7 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
                     switch (cInputDelete)
                     {
 
+                    // Delete (Overwrite) the record and adjust positions of succeeding records.
                     case 'y':
                     case 'Y':
 
@@ -896,6 +946,7 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
                             strcpy(records[i].Answer, records[i + 1].Answer);
                         }
 
+                        // Reduce size of the array.
                         *ctrRecord -= 1;
                         inputValid = true;
                         break;
@@ -909,6 +960,7 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
                         inputValid = false;
                     }
 
+                    // Display confirmation.
                     if (cInputDelete == 'Y' || cInputDelete == 'y')
                     {
 
@@ -931,6 +983,7 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
         } while (*returnManageData == false);
     }
 
+    // Display a message if there is no record.
     else
     {
 
@@ -942,8 +995,9 @@ void deleteRecord(struct quizRecord *records, int *ctrRecord,
 }
 
 /* This function reads a string of a file.
-@param records is the array of structures for quiz records.
-@param ctrRecord is the value of the number of existing records.
+@param fp is the file pointer
+@param tempString holds the string read from the file
+@param nSize is the size of the string depending on what string is being asked.
 @return void
 */
 void readString(FILE *fp, char tempString[], int nSize)
@@ -955,6 +1009,7 @@ void readString(FILE *fp, char tempString[], int nSize)
 
     int nEnd;
 
+    // Loop until value is a new line or string exceeds the limit.
     do
     {
         nEnd = fscanf(fp, "%c", &ch);
@@ -979,9 +1034,11 @@ void readString(FILE *fp, char tempString[], int nSize)
 Precondition: file name is limited to 30 characters.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
+@param returnManageData is an option to return to manage data menu.
 @return void
 */
-void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageData)
+void importRecord(struct quizRecord *records, int *ctrRecord,
+                  bool *returnManageData)
 {
 
     String30 filename;
@@ -996,12 +1053,13 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
     bool existingRecord = false;
     bool multipleRecord = false;
 
+    // Confirm if the number of records has not exceeded the limit.
     if (*ctrRecord < 20)
     {
 
         do
         {
-
+            // Give an option to continue or return menu.
             system("cls");
             printf("Enter filename.");
             printf("\n\nor\n");
@@ -1027,13 +1085,18 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
                 if ((fp = fopen(filename, "r")) != 0)
                 {
 
+                    // Loop if there is more than one record to read.
                     do
                     {
 
                         multipleRecord = false;
                         existingRecord = false;
 
+                        // Read the file.
                         readString(fp, temp.Topic, 21);
+
+                        /*Adjust the question number since the program is not designed
+                          to manually assign a question numebr. */
                         fscanf(fp, "%d ", &temp.Number);
 
                         if (temp.Number != *ctrRecord + 1)
@@ -1048,12 +1111,15 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
                         readString(fp, temp.C3, 31);
                         readString(fp, temp.Answer, 31);
 
-                        if (fscanf(fp, "%d", &checkEOF) != EOF && fscanf(fp, "%d", &checkEOF) != EOF)
+                        // Checks if there is more than one record to store.
+                        if (fscanf(fp, "%d", &checkEOF) != EOF && fscanf(fp,
+                                                                         "%d", &checkEOF) != EOF)
                         {
 
                             multipleRecord = true;
                         }
 
+                        // Checks if the record read already exists.
                         for (int i = 0; i < *ctrRecord; i++)
                         {
 
@@ -1064,6 +1130,7 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
                             }
                         }
 
+                        // If record is unique, complete import and display the record.
                         if (existingRecord != true)
                         {
 
@@ -1072,8 +1139,8 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
                             system("cls");
                             printf("Import Successful.\n\n------------------------------\n");
 
-                            printf("[T]  %s\n\n[#]  %d\n\n[Q]  %s\n\n[C1] %s\n\n[C2] %s\n\n[C3] %s\n\n[A]  %s\n------------------------------\n\n", records[*ctrRecord].Topic,
-                                   records[*ctrRecord].Number, records[*ctrRecord].Question,
+                            printf("[T]  %s\n\n[#]  %d\n\n[Q]  %s\n\n[C1] %s\n\n[C2] %s\n\n[C3] %s\n\n[A]  %s\n------------------------------\n\n",
+                                   records[*ctrRecord].Topic, records[*ctrRecord].Number, records[*ctrRecord].Question,
                                    records[*ctrRecord].C1, records[*ctrRecord].C2,
                                    records[*ctrRecord].C3, records[*ctrRecord].Answer);
 
@@ -1085,6 +1152,7 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
                             *returnManageData = true;
                         }
 
+                        // Display message regarding duplicate record.
                         else
                         {
 
@@ -1096,9 +1164,9 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
 
                                 if (strcmp(temp.Question, records[i].Question) == 0)
                                 {
-
-                                    printf("[T]  %s\n\n[#]  %d\n\n[Q]  %s\n\n[C1] %s\n\n[C2] %s\n\n[C3] %s\n\n[A]  %s\n------------------------------\n\n", records[i].Topic,
-                                           records[i].Number, records[i].Question,
+                                    // Display the existing record.
+                                    printf("[T]  %s\n\n[#]  %d\n\n[Q]  %s\n\n[C1] %s\n\n[C2] %s\n\n[C3] %s\n\n[A]  %s\n------------------------------\n\n",
+                                           records[i].Topic, records[i].Number, records[i].Question,
                                            records[i].C1, records[i].C2,
                                            records[i].C3, records[i].Answer);
                                 }
@@ -1122,6 +1190,7 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
         } while (validInput == false);
     }
 
+    // Display message if the number of records exceeds the limit.
     else
     {
 
@@ -1137,33 +1206,40 @@ void importRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
 Precondition: file name is limited to 30 characters.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
+@param returnManageData is an option to return to manage data menu.
 @return void
 */
-void exportRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageData)
+void exportRecord(struct quizRecord *records, int *ctrRecord,
+                  bool *returnManageData)
 {
 
     FILE *fp;
 
     String20 filename;
 
+    // Checks if there is atleast one record to export.
     if (*ctrRecord > 0)
     {
 
+        // Give an option to continue and to return menu.
         system("cls");
         printf("Enter filename\n\nor\n\n[0] to exit");
         printf("\n\nEnter: ");
         getString(filename, 30);
 
+        // If input is '0', exit.
         if (strcmp(filename, "0") == 0)
         {
 
             *returnManageData = true;
         }
 
+        // Else, continue exporting.
         else
         {
             fp = fopen(filename, "w");
 
+            // Export the data into the file.
             for (int i = 0; i < *ctrRecord; i++)
             {
 
@@ -1181,6 +1257,7 @@ void exportRecord(struct quizRecord *records, int *ctrRecord, bool *returnManage
         }
     }
 
+    // Display message if there is no record.
     else
     {
 
@@ -1201,8 +1278,9 @@ Precondition: cInput from int main() must be 'm' or 'M'
 @param ctrRecord is the value of the number of existing records.
 @return void
 */
-void manageData(struct quizRecord *records, String30 password, String30 tempPassword,
-                String30 currentPassword, bool *returnMenu, int *ctrRecord)
+void manageData(struct quizRecord *records, String30 password,
+                String30 tempPassword, String30 currentPassword,
+                bool *returnMenu, int *ctrRecord)
 {
 
     bool bContinue = false;
@@ -1212,9 +1290,12 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
 
     system("cls");
 
+    // Check if the user has yet to register as admin.
+
     if (strcmp(password, currentPassword) != 0)
     {
-        adminRegistration(password, tempPassword, currentPassword, returnMenu, &bContinue);
+        adminRegistration(password, tempPassword, currentPassword,
+                          returnMenu, &bContinue);
     }
 
     else if (strcmp(password, currentPassword) == 0)
@@ -1223,12 +1304,15 @@ void manageData(struct quizRecord *records, String30 password, String30 tempPass
         adminLogin(password, currentPassword, returnMenu, &bContinue);
     }
 
+    // If registration / login successful, proceed to MANAGE DATA.
     if (bContinue == true)
     {
         do
         {
 
             system("cls");
+
+            // Prompt admin options.
 
             printf("\n[A] to add record");
             printf("\n[E] to edit record");
@@ -1299,6 +1383,7 @@ void randArray(int topicQuestions, int tempArray[topicQuestions])
 
     int j, temp;
 
+    // Randomize positions of the questions using indexes.
     srand(time(NULL));
 
     for (int i = 0; i < topicQuestions; i++)
@@ -1321,6 +1406,8 @@ void sortScores(struct playerRecord *gamePlayer, int *ctrPlayer)
 {
 
     struct playerRecord temp;
+
+    // Implement bubble sort in decreasing order.
 
     for (int i = 0; i < *ctrPlayer; i++)
     {
@@ -1349,7 +1436,8 @@ Precondition: cInput from playGame() must be 'p' or 'P'
 @param ctrPlayer is the number of existing players.
 @return void
 */
-void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int *currentScore, struct playerRecord *gamePlayer, int *ctrPlayer)
+void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu,
+               int *currentScore, struct playerRecord *gamePlayer, int *ctrPlayer)
 {
 
     FILE *fp;
@@ -1369,13 +1457,17 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
     bool endGame = false;
     bool existingPlayer = false;
 
+    // Checks if there is atleast one record to play.
     if (*ctrRecord > 0)
     {
         system("cls");
 
+        // Ask name.
         printf("What is your name?: ");
         getString(playerName, 31);
 
+        /*If player is new, add to list of players. Else, take the index of the
+          existing player.*/
         for (int i = 0; i < *ctrPlayer; i++)
         {
 
@@ -1441,16 +1533,17 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
 
                 system("cls");
 
+                // Display score of the player.
                 if (existingPlayer == true)
                 {
 
-                    printf("%s's score: %d\n--------------------\n\n", playerName, gamePlayer[playerIndex].playerScore);
+                    printf("%s's score: %d\n--------------------\n\n", *currentScore);
                 }
 
                 else
                 {
 
-                    printf("%s's score: %d\n--------------------\n\n", playerName, gamePlayer[*ctrPlayer - 1].playerScore);
+                    printf("%s's score: %d\n--------------------\n\n", *currentScore);
                 }
 
                 printf("Choose a topic\n\n");
@@ -1478,7 +1571,7 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
 
                     // If input is 0, signal exit the game.
                     else if (strcmp(topicInput, "0") == 0)
-                    {   
+                    {
 
                         inputValid = true;
                         *returnMenu = true;
@@ -1505,17 +1598,22 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
 
                 system("cls");
 
+                // Display message and player score.
                 if (existingPlayer == true)
                 {
 
-                    printf("Thank you for playing!\n%s's score: %d\n\n", playerName, gamePlayer[playerIndex].playerScore);
+                    printf("Thank you for playing!\n%s's total score: %d\n\n", playerName,
+                           gamePlayer[playerIndex].playerScore);
                 }
 
                 else
                 {
 
-                    printf("Thank you for playing!\n%s's score: %d\n\n", playerName, gamePlayer[*ctrPlayer - 1].playerScore);
+                    printf("Thank you for playing!\n%s's total score: %d\n\n", playerName,
+                           gamePlayer[*ctrPlayer - 1].playerScore);
                 }
+
+                // Sort the scores in decreasing order and export data.
 
                 sortScores(gamePlayer, ctrPlayer);
 
@@ -1549,24 +1647,26 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
                     }
                 }
 
+                // Generate a random question.
                 randArray(topicQuestions, tempArray);
 
                 for (int i = 0; i < *ctrRecord; i++)
                 {
 
+                    // Display score, question, and choices.
                     if (tempArray[0] == records[i].Number)
                     {
 
                         if (existingPlayer == true)
                         {
 
-                            printf("%s's score: %d\n--------------------\n\n", playerName, gamePlayer[playerIndex].playerScore);
+                            printf("%s's score: %d\n--------------------\n\n", *currentScore);
                         }
 
                         else
                         {
 
-                            printf("%s's score: %d\n--------------------\n\n", playerName, gamePlayer[*ctrPlayer - 1].playerScore);
+                            printf("%s's score: %d\n--------------------\n\n", *currentScore);
                         }
 
                         printf("%d. %s\n\n", records[i].Number, records[i].Question);
@@ -1577,27 +1677,28 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
                         printf("\nWhat is your answer?: ");
                         getString(quizAnswer, 31);
 
+                        // Add a point if the answer is correct.
                         if (strcmp(quizAnswer, records[i].Answer) == 0)
                         {
 
                             if (existingPlayer == true)
                             {
-
+                                *currentScore += 1;
                                 gamePlayer[playerIndex].playerScore += 1;
                             }
 
                             else
                             {
-
+                                *currentScore += 1;
                                 gamePlayer[*ctrPlayer - 1].playerScore += 1;
                             }
-                            *currentScore += 1;
 
                             system("cls");
                             printf("Correct! you gained a point.\n\n");
                             system("pause");
                         }
 
+                        // Display sorry message after an incorrect answer input.
                         else
                         {
 
@@ -1608,9 +1709,11 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
                     }
                 }
             }
-        } while (endGame == false);
+
+        } while (endGame == false); // Loop until player ends the game.
     }
 
+    // Display message if there is no record.
     else
     {
 
@@ -1620,8 +1723,8 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
     }
 }
 
-/* This function displays the player's name and scores from an imported file and the
-   current score accumulated from the program.
+/* This function displays the player's name and scores from an imported file
+   and the current score accumulated from the program.
 Precondition: cInput from playGame() must be 'p' or 'P'
 @param currentScore is the current score of the player.
 @param gamePlayer is the array of structures for player records.
@@ -1633,13 +1736,16 @@ void viewScores(int *currentScore, struct playerRecord *gamePlayer, int *ctrPlay
 
     system("cls");
 
+    // Initialize row number.
     int rowNumber = 1;
 
     FILE *fp;
 
     fp = fopen("score.txt", "r");
 
-    if (ftell(fp) == 0){
+    // Display scores if there exists one.
+    if (ftell(fp) == 0)
+    {
         // Used spaces since \t does not work.
         printf("\nRanking");
         printf("    Name");
@@ -1648,13 +1754,16 @@ void viewScores(int *currentScore, struct playerRecord *gamePlayer, int *ctrPlay
         for (int i = 0; i < *ctrPlayer; i++)
         {
 
-            printf("#%-10d%-15s%-5d\n", rowNumber, gamePlayer[i].playerName, gamePlayer[i].playerScore);
+            printf("#%-10d%-15s%-5d\n", rowNumber, gamePlayer[i].playerName,
+                   gamePlayer[i].playerScore);
 
             rowNumber += 1;
         }
     }
 
-    else{
+    // Display message if there are no current scores.
+    else
+    {
 
         printf("There are currently no scores to display.");
     }
@@ -1674,7 +1783,8 @@ Precondition: cInput from int main() must be 'p' or 'P'
 @param gamePlayer is the array of structures for player records.
 @return void
 */
-void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int *currentScore, struct playerRecord *gamePlayer)
+void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord,
+              int *currentScore, struct playerRecord *gamePlayer)
 {
 
     char cInput;
@@ -1687,9 +1797,12 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
 
     FILE *fp;
 
+    // Store data (Player names and respective scores) from file to program.
+
     fp = fopen("score.txt", "r");
 
-    if (ftell(fp) == 0){
+    if (ftell(fp) == 0)
+    {
 
         do
         {
@@ -1701,13 +1814,12 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
 
         } while (fscanf(fp, "%d", &checkEOF) != EOF);
 
-    fclose(fp);
-
+        fclose(fp);
     }
 
     do
     {
-
+        // Sort scores in decreasing order
         sortScores(gamePlayer, &ctrPlayer);
 
         system("cls");
@@ -1724,17 +1836,20 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
 
         case 'p':
         case 'P':
-            startGame(records, ctrRecord, returnMenu, currentScore, gamePlayer, &ctrPlayer);
-            
+
+            *currentScore = 0; // Reset ingame score (Not the overall score).
+
+            startGame(records, ctrRecord, returnMenu, currentScore, gamePlayer,
+                      &ctrPlayer);
+
             validInput = true;
             *returnMenu = false;
             break;
 
         case 'v':
         case 'V':
-
             viewScores(currentScore, gamePlayer, &ctrPlayer);
-            
+
             validInput = true;
             *returnMenu = false;
             break;
@@ -1742,7 +1857,6 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
         case 'e':
         case 'E':
 
-            *currentScore = 0;
             *returnMenu = true;
             validInput = true;
             break;
@@ -1789,6 +1903,7 @@ void enterMenu(struct quizRecord *records, String30 password,
         printf("\n\nPress [P] to play.\n\n");
         printf("Press [M] to manage data\n\n");
 
+        // Prompt to play or access admin.
         printf("Enter: ");
         scanf("%c", &cInput);
 
@@ -1797,7 +1912,8 @@ void enterMenu(struct quizRecord *records, String30 password,
 
         case 'p':
         case 'P':
-            playGame(records, &returnMenu, &ctrRecord, currentScore, gamePlayer);
+            playGame(records, &returnMenu, &ctrRecord, currentScore,
+                     gamePlayer);
             validInput = true;
             break;
 
@@ -1805,7 +1921,8 @@ void enterMenu(struct quizRecord *records, String30 password,
         case 'M':
             validInput = true;
             returnMenu = false;
-            manageData(records, password, tempPassword, currentPassword, &returnMenu, &ctrRecord);
+            manageData(records, password, tempPassword, currentPassword,
+                       &returnMenu, &ctrRecord);
             break;
 
         default:
@@ -1829,7 +1946,8 @@ int main()
 
     struct playerRecord gamePlayer[SIZE];
 
-    enterMenu(records, password, tempPassword, currentPassword, &currentScore, gamePlayer);
+    enterMenu(records, password, tempPassword, currentPassword,
+              &currentScore, gamePlayer);
 
     return 0;
 }
