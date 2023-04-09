@@ -1352,6 +1352,8 @@ Precondition: cInput from playGame() must be 'p' or 'P'
 void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int *currentScore, struct playerRecord *gamePlayer, int *ctrPlayer)
 {
 
+    FILE *fp;
+
     int tempSize = *ctrRecord;
     int topicQuestions = 0;
     int tempArray[20];
@@ -1476,7 +1478,8 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
 
                     // If input is 0, signal exit the game.
                     else if (strcmp(topicInput, "0") == 0)
-                    {
+                    {   
+
                         inputValid = true;
                         *returnMenu = true;
                         endGame = true;
@@ -1505,14 +1508,26 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
                 if (existingPlayer == true)
                 {
 
-                    printf("%s's score: %d\n\n", playerName, gamePlayer[playerIndex].playerScore);
+                    printf("Thank you for playing!\n%s's score: %d\n\n", playerName, gamePlayer[playerIndex].playerScore);
                 }
 
                 else
                 {
 
-                    printf("%s's score: %d\n\n", playerName, gamePlayer[*ctrPlayer - 1].playerScore);
+                    printf("Thank you for playing!\n%s's score: %d\n\n", playerName, gamePlayer[*ctrPlayer - 1].playerScore);
                 }
+
+                sortScores(gamePlayer, ctrPlayer);
+
+                fp = fopen("score.txt", "w");
+
+                for (int i = 0; i < *ctrPlayer; i++)
+                {
+
+                    fprintf(fp, "%s\n%d\n\n", gamePlayer[i].playerName, gamePlayer[i].playerScore);
+                }
+
+                fclose(fp);
 
                 system("pause");
             }
@@ -1579,7 +1594,7 @@ void startGame(struct quizRecord *records, int *ctrRecord, bool *returnMenu, int
                             *currentScore += 1;
 
                             system("cls");
-                            printf("Correct! your score gained a point.\n\n");
+                            printf("Correct! you gained a point.\n\n");
                             system("pause");
                         }
 
@@ -1620,20 +1635,33 @@ void viewScores(int *currentScore, struct playerRecord *gamePlayer, int *ctrPlay
 
     int rowNumber = 1;
 
-    // Used spaces since \t does not work.
-    printf("\nRanking");
-    printf("    Name");
-    printf("           Score\n\n");
+    FILE *fp;
 
-    for (int i = 0; i < *ctrPlayer; i++)
-    {
+    fp = fopen("score.txt", "r");
 
-        printf("  #%-8d%-15s%-5d\n", rowNumber, gamePlayer[i].playerName, gamePlayer[i].playerScore);
+    if (ftell(fp) == 0){
+        // Used spaces since \t does not work.
+        printf("\nRanking");
+        printf("    Name");
+        printf("           Score\n\n");
 
-        rowNumber += 1;
+        for (int i = 0; i < *ctrPlayer; i++)
+        {
+
+            printf("#%-10d%-15s%-5d\n", rowNumber, gamePlayer[i].playerName, gamePlayer[i].playerScore);
+
+            rowNumber += 1;
+        }
     }
 
+    else{
+
+        printf("There are currently no scores to display.");
+    }
+    printf("\n\n");
     system("pause");
+
+    fclose(fp);
 }
 
 /* This function is the menu of the play option of the program.
@@ -1661,18 +1689,21 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
 
     fp = fopen("score.txt", "r");
 
-    do
-    {
+    if (ftell(fp) == 0){
 
-        readString(fp, gamePlayer[ctrPlayer].playerName, 21);
-        fscanf(fp, " %d", &gamePlayer[ctrPlayer].playerScore);
-        fscanf(fp, "%c", &checkNL);
+        do
+        {
+            readString(fp, gamePlayer[ctrPlayer].playerName, 21);
+            fscanf(fp, " %d", &gamePlayer[ctrPlayer].playerScore);
+            fscanf(fp, "%c", &checkNL);
 
-        ctrPlayer += 1;
+            ctrPlayer += 1;
 
-    } while (fscanf(fp, "%d", &checkEOF) != EOF);
+        } while (fscanf(fp, "%d", &checkEOF) != EOF);
 
     fclose(fp);
+
+    }
 
     do
     {
@@ -1694,29 +1725,22 @@ void playGame(struct quizRecord *records, bool *returnMenu, int *ctrRecord, int 
         case 'p':
         case 'P':
             startGame(records, ctrRecord, returnMenu, currentScore, gamePlayer, &ctrPlayer);
+            
             validInput = true;
             *returnMenu = false;
             break;
 
         case 'v':
         case 'V':
+
             viewScores(currentScore, gamePlayer, &ctrPlayer);
+            
             validInput = true;
             *returnMenu = false;
             break;
 
         case 'e':
         case 'E':
-
-            fp = fopen("score.txt", "w");
-
-            for (int i = 0; i < ctrPlayer; i++)
-            {
-
-                fprintf(fp, "%s\n%d\n\n", gamePlayer[i].playerName, gamePlayer[i].playerScore);
-            }
-
-            fclose(fp);
 
             *currentScore = 0;
             *returnMenu = true;
