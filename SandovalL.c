@@ -279,7 +279,8 @@ void adminRegistration(String30 password, String30 tempPassword,
 }
 
 /* This function is for adding a record into the quiz.
-Precondition: Assume that the input is case sensitive when checking existing records.
+Precondition: Input is case sensitive.
+              The total number of records is less than 20.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
 @param returnManageData is an option to return to manage data menu.
@@ -464,6 +465,7 @@ void addRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDat
 
 /* This function is for editing existing records of the quiz.
 Precondition: Topic names are case sensitive.
+              There is at least one record.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
 @param returnManageData is an option to return to manage data menu.
@@ -756,7 +758,7 @@ void editRecord(struct quizRecord *records, int *ctrRecord, bool *returnManageDa
 }
 
 /* This function is for deleting existing records of the quiz.
-Precondition: Topic names are case sensitive.
+Precondition: There is at least one record.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
 @param returnManageData is an option to return to manage data menu.
@@ -1032,6 +1034,7 @@ void readString(FILE *fp, char tempString[], int nSize)
 
 /* This function imports a record through a specified filename.
 Precondition: file name is limited to 30 characters.
+              Total number of records is less than 20.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
 @param returnManageData is an option to return to manage data menu.
@@ -1113,7 +1116,8 @@ void importRecord(struct quizRecord *records, int *ctrRecord,
 
                         // Checks if there is more than one record to store.
                         if (fscanf(fp, "%d", &checkEOF) != EOF && fscanf(fp,
-                                                                         "%d", &checkEOF) != EOF)
+                            "%d", &checkEOF) != EOF) /*If there are two new lines after a string
+                                                       this indicates that there is a record in the next line.*/
                         {
 
                             multipleRecord = true;
@@ -1204,6 +1208,7 @@ void importRecord(struct quizRecord *records, int *ctrRecord,
 
 /* This function exports a record given a specified filename.
 Precondition: file name is limited to 30 characters.
+              And there is at least one existing record.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
 @param returnManageData is an option to return to manage data menu.
@@ -1394,6 +1399,8 @@ void randArray(int topicQuestions, int tempArray[topicQuestions])
         temp = tempArray[i];
         tempArray[i] = tempArray[j];
         tempArray[j] = temp;
+
+        
     }
 }
 
@@ -1426,7 +1433,7 @@ void sortScores(struct playerRecord *gamePlayer, int *ctrPlayer)
     }
 }
 /* This function is the quiz game itself.
-Precondition: cInput from playGame() must be 'p' or 'P'
+Precondition: There is atleast one record in order to play.
 @param records is the array of structures for quiz records.
 @param ctrRecord is the value of the number of existing records.
 @param returnMenu This is for choosing if the user wishes to return to the
